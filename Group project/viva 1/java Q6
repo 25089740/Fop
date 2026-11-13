@@ -1,0 +1,113 @@
+import java.util.Scanner;
+
+public class TwoRobotsWarehouse {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter robot commands: ");
+        String commands = scanner.nextLine();
+
+        // Validate the command string
+        for (int i = 0; i < commands.length(); i++) {
+            char c = commands.charAt(i);
+            if ("FBLRfblr".indexOf(c) == -1) {
+                System.out.println("Invalid Command String");
+                return;
+            }
+        }
+
+        // Robot P state: (xP, yP), direction: 0=N, 1=E, 2=S, 3=W
+        int xP = 0, yP = 0, dirP = 0;
+        // Robot Q state: (xQ, yQ), direction: 0=N, 1=E, 2=S, 3=W
+        int xQ = 0, yQ = 0, dirQ = 0;
+
+        int meetings = 0;
+        int originReturns = 0;
+        int maxGap = 0;
+
+        char[] dirs = {'N', 'E', 'S', 'W'};
+
+        // Simulate robot movements and turns
+        for (int i = 0; i < commands.length(); i++) {
+            char c = commands.charAt(i);
+            boolean moved = false;
+
+            if (c == 'F' || c == 'B') {
+                int step = (c == 'F') ? 1 : -1;
+                if (dirP == 0) yP += step;
+                else if (dirP == 1) xP += step;
+                else if (dirP == 2) yP -= step;
+                else if (dirP == 3) xP -= step;
+
+                moved = true;
+                if (xP == 0 && yP == 0) {
+                    originReturns++;
+                }
+            } else if (c == 'R') {
+                dirP = (dirP + 1) % 4;
+            } else if (c == 'L') {
+                dirP = (dirP + 3) % 4;
+            } else if (c == 'f' || c == 'b') {
+                int step = (c == 'f') ? 1 : -1;
+                if (dirQ == 0) yQ += step;
+                else if (dirQ == 1) xQ += step;
+                else if (dirQ == 2) yQ -= step;
+                else if (dirQ == 3) xQ -= step;
+
+                moved = true;
+                if (xQ == 0 && yQ == 0) {
+                    originReturns++;
+                }
+            } else if (c == 'r') {
+                dirQ = (dirQ + 1) % 4;
+            } else if (c == 'l') {
+                dirQ = (dirQ + 3) % 4;
+            }
+
+            if (moved) {
+                if (xP == xQ && yP == yQ) {
+                    meetings++;
+                }
+                int gap = Math.abs(xP - xQ) + Math.abs(yP - yQ);
+                if (gap > maxGap) {
+                    maxGap = gap;
+                }
+            }
+        }
+
+               if (len > 0 && isOpposite(simplified.charAt(len - 1), c)) {
+                simplified.deleteCharAt(len - 1);
+            } else {
+                len = simplified.length();
+                if (len >= 4 && isTurn(c)) {
+                    if (simplified.charAt(len - 1) == c &&
+                        simplified.charAt(len - 2) == c &&
+                        simplified.charAt(len - 3) == c &&
+                        simplified.charAt(len - 4) == c) {
+                        simplified.delete(len - 4, len);
+                    }
+                }
+            }
+        }
+
+        String finalSimplified = simplified.length() == 0 ? "EMPTY" : simplified.toString();
+
+        // Print results
+        System.out.println("Meetings: " + meetings);
+        System.out.println("Origin Returns: " + originReturns);
+        System.out.println("Maximum Gap: " + maxGap);
+        System.out.println("Robot P Final: (" + xP + "," + yP + ") facing " + dirs[dirP]);
+        System.out.println("Robot Q Final: (" + xQ + "," + yQ + ") facing " + dirs[dirQ]);
+        System.out.println("Simplified Commands: " + finalSimplified);
+    }
+
+    private static boolean isOpposite(char a, char b) {
+        return (a == 'F' && b == 'B') || (a == 'B' && b == 'F') ||
+               (a == 'L' && b == 'R') || (a == 'R' && b == 'L') ||
+               (a == 'f' && b == 'b') || (a == 'b' && b == 'f') ||
+               (a == 'l' && b == 'r') || (a == 'r' && b == 'l');
+    }
+
+    private static boolean isTurn(char c) {
+        return c == 'L' || c == 'R' || c == 'l' || c == 'r';
+    }
+}
